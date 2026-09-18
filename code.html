@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Campainha Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul: #1F3A44;
+    --azul-claro: #2C4F5C;
+    --dourado: #C99A3E;
+    --dourado-escuro: #A87F2E;
+    --fundo: #F5F1E8;
+    --cartao: #FFFFFF;
+    --texto: #1F2A2E;
+    --texto-suave: #55625F;
+    --sucesso: #2F6B4F;
+    --raio: 16px;
+    --sombra: 0 4px 18px rgba(31,58,68,0.08);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --fundo: #121B19;
+      --cartao: #1B2826;
+      --texto: #F2EEE4;
+      --texto-suave: #A3B0AB;
+      --azul: #3C6E80;
+      --azul-claro: #4C8296;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--fundo);
+    color: var(--texto);
+    font-family: 'Atkinson Hyperlegible', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 16px;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  header .selo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--azul);
+    color: #fff;
+    font-size: 30px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  header h1 {
+    font-size: 1.6rem;
+    margin: 0 0 6px;
+    color: var(--azul);
+    font-weight: 700;
+  }
+
+  header p {
+    margin: 0;
+    color: var(--texto-suave);
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .tela {
+    background: var(--cartao);
+    border-radius: var(--raio);
+    box-shadow: var(--sombra);
+    padding: 24px;
+    margin-bottom: 16px;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .instrucao {
+    font-size: 1.15rem;
+    text-align: center;
+    margin: 0 0 20px;
+    line-height: 1.4;
+    font-weight: 400;
+  }
+
+  .grid-casas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .btn-casa {
+    background: var(--fundo);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 16px 8px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--azul);
+    cursor: pointer;
+    transition: transform .08s ease, border-color .15s ease, background-color .15s ease;
+    min-height: 60px;
+  }
+
+  .btn-casa:hover, .btn-casa:focus-visible {
+    border-color: var(--dourado);
+    outline: none;
+  }
+
+  .btn-casa:active {
+    transform: scale(0.96);
+  }
+
+  .btn-grande {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: var(--azul);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 12px;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color .15s ease, transform .08s ease;
+  }
+
+  .btn-grande:hover, .btn-grande:focus-visible {
+    background: var(--azul-claro);
+    outline: 2px solid var(--dourado);
+    outline-offset: 2px;
+  }
+
+  .btn-grande:active {
+    transform: scale(0.98);
+  }
+
+  .btn-secundario {
+    display: block;
+    width: 100%;
+    background: transparent;
+    color: var(--texto-suave);
+    border: 2px solid var(--fundo);
+    border-radius: 12px;
+    padding: 14px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: border-color .15s ease;
+  }
+
+  .btn-secundario:hover {
+    border-color: var(--dourado);
+  }
+
+  .cartao-papel {
+    background: var(--fundo);
+    border: 2px solid transparent;
+    border-radius: 14px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    color: var(--azul);
+    transition: border-color .15s ease, transform .08s ease;
+  }
+
+  .cartao-papel:hover, .cartao-papel:focus-visible {
+    border-color: var(--dourado);
+    outline: none;
+  }
+
+  .cartao-papel:active {
+    transform: scale(0.97);
+  }
+
+  .cartao-papel .icone {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .cartao-papel .titulo {
+    font-size: 1.15rem;
+    font-weight: 700;
+    display: block;
+  }
+
+  .duas-colunas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .destaque-casa {
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--dourado-escuro);
+    margin: 0 0 12px;
+  }
+
+  .centro { text-align: center; }
+  .icone-grande { font-size: 3.2rem; margin-bottom: 8px; }
+
+  .campo {
+    margin-bottom: 16px;
+    text-align: left;
+  }
+
+  .campo label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--azul);
+  }
+
+  .campo input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid var(--fundo);
+    background: var(--fundo);
+    color: var(--texto);
+    font-family: inherit;
+    font-size: 1.05rem;
+    transition: border-color .15s ease;
+  }
+
+  .campo input:focus {
+    outline: none;
+    border-color: var(--dourado);
+  }
+
+  .selo-papel {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--texto-suave);
+    background: var(--fundo);
+    border-radius: 20px;
+    padding: 6px 14px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .oculto { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER DA APLICAÇÃO -->
+  <header>
+    <div class="selo">🔔</div>
+    <h1 id="nomeCondominio">Campainha Digital</h1>
+    <p>Aviso de entregas e visitas sem contato direto com o morador</p>
+  </header>
+
+  <!-- 1. TELA INICIAL: Selecionar perfil -->
+  <section id="telaInicio" class="tela">
+    <p class="instrucao">Você está aqui como:</p>
+    <div class="duas-colunas">
+      <button type="button" class="cartao-papel" id="btnSouEntregador">
+        <span class="icone">📦</span>
+        <span class="titulo">Entregador</span>
+      </button>
+      <button type="button" class="cartao-papel" id="btnSouVisitante">
+        <span class="icone">🧑‍🤝‍🧑</span>
+        <span class="titulo">Visitante</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- 2. TELA SELEÇÃO: Selecionar casa/unidade -->
+  <section id="telaSelecao" class="tela oculto">
+    <div class="centro"><span class="selo-papel" id="seloPerfilSelecao">Entregador</span></div>
+    <p class="instrucao" id="instrucaoSelecao">Toque no número da casa que vai receber a entrega</p>
+    <div id="gridCasas" class="grid-casas"></div>
+    <button type="button" class="btn-secundario" id="btnVoltarInicio">Voltar</button>
+  </section>
+
+  <!-- 3. TELA DADOS: Preenchimento e confirmação -->
+  <section id="telaDados" class="tela oculto">
+    <div class="centro">
+      <span class="selo-papel" id="seloPerfilDados">Entregador</span>
+      <div class="icone-grande" id="iconeDados">📦</div>
+      <p class="destaque-casa" id="casaEscolhida"></p>
+    </div>
+    <div class="campo">
+      <label id="labelDados" for="inputDados">Nome da empresa de entrega</label>
+      <input type="text" id="inputDados" placeholder="Ex: Shopee, Mercado Livre..." autocomplete="off">
+    </div>
+    <a class="btn-grande" id="btnConfirmar" href="#" target="_blank" rel="noopener">Confirmar e avisar o síndico</a>
+    <button type="button" class="btn-secundario" id="btnVoltarSelecao">Escolher outra casa</button>
+  </section>
+
+  <!-- 4. TELA SUCESSO: Confirmação de envio -->
+  <section id="telaSucesso" class="tela oculto">
+    <div class="centro">
+      <div class="icone-grande">✅</div>
+      <p class="instrucao"><strong>Aviso pronto!</strong><br>O WhatsApp será aberto com a mensagem preenchida. Basta tocar em enviar.</p>
+    </div>
+    <button type="button" class="btn-grande" id="btnNovaEntrega">Registrar outra entrada</button>
+  </section>
+
+</div>
+
+<script>
+(function() {
+  const FIRSTDOOR = "11958886854";
+  const LISTA_CASAS = ["Casa 1", "Casa 2", "Casa 3", "Casa 4", "Casa 5", "Casa 6"];
+
+  let casaAtual = null;
+  let perfilAtual = null; // 'entregador' ou 'visitante'
+
+  // Referências dos elementos DOM
+  const telaInicio = document.getElementById('telaInicio');
+  const telaSelecao = document.getElementById('telaSelecao');
+  const telaDados = document.getElementById('telaDados');
+  const telaSucesso = document.getElementById('telaSucesso');
+  const gridCasas = document.getElementById('gridCasas');
+  const btnConfirmar = document.getElementById('btnConfirmar');
+  const inputDados = document.getElementById('inputDados');
+
+  const TODAS_TELAS = [telaInicio, telaSelecao, telaDados, telaSucesso];
+
+  // Alterna as telas do app
+  function mostrarTela(tela) {
+    TODAS_TELAS.forEach(t => t.classList.add('oculto'));
+    tela.classList.remove('oculto');
+  }
+
+  // Monta a grade de botões das casas
+  function renderizarCasas() {
+    gridCasas.innerHTML = '';
+    LISTA_CASAS.forEach(casa => {
+      const btn = document.createElement('button');
+      btn.className = 'btn-casa';
+      btn.type = 'button';
+      btn.textContent = casa;
+      btn.addEventListener('click', () => irParaTelaDados(casa));
+      gridCasas.appendChild(btn);
+    });
+  }
+
+  // Transição para a tela de seleção de casas
+  function irParaTelaSelecao(perfil) {
+    perfilAtual = perfil;
+    document.getElementById('seloPerfilSelecao').textContent = perfil === 'entregador' ? 'Entregador' : 'Visitante';
+    document.getElementById('instrucaoSelecao').textContent = perfil === 'entregador'
+      ? 'Toque no número da casa que vai receber a entrega'
+      : 'Toque no número da casa que você vai visitar';
+    mostrarTela(telaSelecao);
+  }
+
+  // Transição para a tela de formulário de dados
+  function irParaTelaDados(casa) {
+    casaAtual = casa;
+    document.getElementById('casaEscolhida').textContent = casa;
+    document.getElementById('seloPerfilDados').textContent = perfilAtual === 'entregador' ? 'Entregador' : 'Visitante';
+    document.getElementById('iconeDados').textContent = perfilAtual === 'entregador' ? '📦' : '🧑‍🤝‍🧑';
+    document.getElementById('labelDados').textContent = perfilAtual === 'entregador'
+      ? 'Nome da empresa de entrega'
+      : 'Seu nome';
+
+    inputDados.placeholder = perfilAtual === 'entregador' ? 'Ex: Shopee, Mercado Livre...' : 'Digite o seu nome aqui';
+    inputDados.value = '';
+    
+    atualizarLinkConfirmar();
+    mostrarTela(telaDados);
+  }
+
+  // Constrói a mensagem customizada de envio
+  function montarMensagem() {
+    const dado = inputDados.value.trim();
+    if (perfilAtual === 'entregador') {
+      const empresa = dado || 'entrega';
+      return `Olá! Cheguei com encomenda de ${empresa} para a ${casaAtual}`;
+    } else {
+      const nome = dado || 'visitante';
+      return `Olá! A ${casaAtual} tem uma visita de ${nome}`;
+    }
+  }
+
+  // Gera a URL do WhatsApp para o número fixo do síndico
+  function atualizarLinkConfirmar() {
+    const mensagem = encodeURIComponent(montarMensagem());
+    btnConfirmar.href = `https://wa.me/55${FIRSTDOOR}?text=${mensagem}`;
+  }
+
+  // Event Listeners
+  inputDados.addEventListener('input', atualizarLinkConfirmar);
+
+  document.getElementById('btnSouEntregador').addEventListener('click', () => {
+    irParaTelaSelecao('entregador');
+  });
+
+  document.getElementById('btnSouVisitante').addEventListener('click', () => {
+    irParaTelaSelecao('visitante');
+  });
+
+  document.getElementById('btnVoltarInicio').addEventListener('click', () => {
+    perfilAtual = null;
+    mostrarTela(telaInicio);
+  });
+
+  document.getElementById('btnVoltarSelecao').addEventListener('click', () => {
+    casaAtual = null;
+    irParaTelaSelecao(perfilAtual);
+  });
+
+  btnConfirmar.addEventListener('click', () => {
+    setTimeout(() => mostrarTela(telaSucesso), 300);
+  });
+
+  document.getElementById('btnNovaEntrega').addEventListener('click', () => {
+    casaAtual = null;
+    perfilAtual = null;
+    mostrarTela(telaInicio);
+  });
+
+  // Inicialização
+  renderizarCasas();
+  mostrarTela(telaInicio);
+})();
+</script>
+</body>
+</html>
