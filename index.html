@@ -186,6 +186,35 @@
     border-color: var(--dourado);
   }
 
+  .btn-audio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: var(--fundo);
+    color: var(--azul);
+    border: 2px solid var(--dourado);
+    border-radius: 12px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 14px;
+    transition: background-color .15s ease, transform .08s ease;
+  }
+
+  .btn-audio:hover, .btn-audio:focus-visible {
+    background: var(--dourado);
+    color: #fff;
+    outline: none;
+  }
+
+  .btn-audio:active {
+    transform: scale(0.98);
+  }
+
   .cartao-papel {
     background: var(--fundo);
     border: 2px solid transparent;
@@ -295,6 +324,7 @@
 
   <!-- 1. TELA INICIAL: Selecionar perfil -->
   <section id="telaInicio" class="tela">
+    <button type="button" class="btn-audio" data-falar="Você está aqui como entregador ou visitante? Toque em uma das opções abaixo.">🔊 Ouvir instrução</button>
     <p class="instrucao">Você está aqui como:</p>
     <div class="duas-colunas">
       <button type="button" class="cartao-papel" id="btnSouEntregador">
@@ -310,6 +340,7 @@
 
   <!-- 2. TELA SELEÇÃO: Selecionar casa/unidade -->
   <section id="telaSelecao" class="tela oculto">
+    <button type="button" class="btn-audio" id="btnAudioSelecao">🔊 Ouvir instrução</button>
     <div class="centro"><span class="selo-papel" id="seloPerfilSelecao">Entregador</span></div>
     <p class="instrucao" id="instrucaoSelecao">Toque no número da casa que vai receber a entrega</p>
     <div id="gridCasas" class="grid-casas"></div>
@@ -318,6 +349,7 @@
 
   <!-- 3. TELA DADOS: Preenchimento e confirmação -->
   <section id="telaDados" class="tela oculto">
+    <button type="button" class="btn-audio" id="btnAudioDados">🔊 Ouvir instrução</button>
     <div class="centro">
       <span class="selo-papel" id="seloPerfilDados">Entregador</span>
       <div class="icone-grande" id="iconeDados">📦</div>
@@ -350,7 +382,7 @@
   let casaAtual = null;
   let perfilAtual = null; // 'entregador' ou 'visitante'
 
-  // Referências dos elementos DOM
+  // Referências dos elementos
   const telaInicio = document.getElementById('telaInicio');
   const telaSelecao = document.getElementById('telaSelecao');
   const telaDados = document.getElementById('telaDados');
@@ -360,6 +392,43 @@
   const inputDados = document.getElementById('inputDados');
 
   const TODAS_TELAS = [telaInicio, telaSelecao, telaDados, telaSucesso];
+
+  // ===== RECURSOS DE ACESSIBILIDADE SONORA =====
+
+  // Toca um bipe de confirmação curto (Web Audio API, sem depender de arquivo externo)
+  function tocarBip() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.25);
+    } catch (e) {
+      // Navegador sem suporte a Web Audio API: falha silenciosamente
+    }
+  }
+
+  // Lê em voz alta um texto de instrução (Web Speech API)
+  function falar(texto) {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(texto);
+    utter.lang = 'pt-BR';
+    utter.rate = 0.95;
+    window.speechSynthesis.speak(utter);
+  }
+
+  // Liga todos os botões de áudio estáticos (com data-falar) ao TTS
+  document.querySelectorAll('[data-falar]').forEach(btn => {
+    btn.addEventListener('click', () => falar(btn.getAttribute('data-falar')));
+  });
+
+  // ===== NAVEGAÇÃO DO APP =====
 
   // Alterna as telas do app
   function mostrarTela(tela) {
@@ -383,29 +452,45 @@
   // Transição para a tela de seleção de casas
   function irParaTelaSelecao(perfil) {
     perfilAtual = perfil;
-    document.getElementById('seloPerfilSelecao').textContent = perfil === 'entregador' ? 'Entregador' : 'Visitante';
-    document.getElementById('instrucaoSelecao').textContent = perfil === 'entregador'
+    const instrucaoTexto = perfil === 'entregador'
       ? 'Toque no número da casa que vai receber a entrega'
       : 'Toque no número da casa que você vai visitar';
+
+    document.getElementById('seloPerfilSelecao').textContent = perfil === 'entregador' ? 'Entregador' : 'Visitante';
+    document.getElementById('instrucaoSelecao').textContent = instrucaoTexto;
+    document.getElementById('btnAudioSelecao').setAttribute('data-falar-dinamico', instrucaoTexto);
+
     mostrarTela(telaSelecao);
   }
 
   // Transição para a tela de formulário de dados
   function irParaTelaDados(casa) {
     casaAtual = casa;
+    const labelTexto = perfilAtual === 'entregador' ? 'Nome da empresa de entrega' : 'Seu nome';
+    const instrucaoTexto = perfilAtual === 'entregador'
+      ? `Confirme a entrega para a ${casa}. Digite o nome da empresa e toque em confirmar.`
+      : `Confirme a visita à ${casa}. Digite o seu nome e toque em confirmar.`;
+
     document.getElementById('casaEscolhida').textContent = casa;
     document.getElementById('seloPerfilDados').textContent = perfilAtual === 'entregador' ? 'Entregador' : 'Visitante';
     document.getElementById('iconeDados').textContent = perfilAtual === 'entregador' ? '📦' : '🧑‍🤝‍🧑';
-    document.getElementById('labelDados').textContent = perfilAtual === 'entregador'
-      ? 'Nome da empresa de entrega'
-      : 'Seu nome';
+    document.getElementById('labelDados').textContent = labelTexto;
+    document.getElementById('btnAudioDados').setAttribute('data-falar-dinamico', instrucaoTexto);
 
     inputDados.placeholder = perfilAtual === 'entregador' ? 'Ex: Shopee, Mercado Livre...' : 'Digite o seu nome aqui';
     inputDados.value = '';
-    
+
     atualizarLinkConfirmar();
     mostrarTela(telaDados);
   }
+
+  // Botões de áudio cujo texto muda dinamicamente (selecão e dados)
+  document.getElementById('btnAudioSelecao').addEventListener('click', function() {
+    falar(this.getAttribute('data-falar-dinamico'));
+  });
+  document.getElementById('btnAudioDados').addEventListener('click', function() {
+    falar(this.getAttribute('data-falar-dinamico'));
+  });
 
   // Constrói a mensagem customizada de envio
   function montarMensagem() {
@@ -447,6 +532,7 @@
   });
 
   btnConfirmar.addEventListener('click', () => {
+    tocarBip();
     setTimeout(() => mostrarTela(telaSucesso), 300);
   });
 
